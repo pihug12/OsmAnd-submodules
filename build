@@ -1,4 +1,9 @@
-#!/bin/bash -ex
+#!/bin/bash
+
+err() {
+	echo ERR: "$@"
+	exit 1
+}
 
 # Uses ANDROID_SDK instead of ANDROID_HOME
 if [[ -z $ANDROID_SDK ]] && [[ -n $ANDROID_HOME ]]
@@ -6,13 +11,16 @@ then
 	export ANDROID_SDK="$ANDROID_HOME"
 fi
 
-[[ -d android/OsmAnd ]] && cd android/OsmAnd
+if [[ -d android/OsmAnd ]]
+then
+	cd android/OsmAnd || err "Could not enter android/OsmAnd subdirectory"
+fi
 
 # Replace the name given to the full paid app
-sed -i 's/"OsmAnd+"/"OsmAnd~"/g' build.xml
+sed -i 's/"OsmAnd+"/"OsmAnd~"/g' build.xml || err "Could not replace application name"
 
 # Build native code
-./old-ndk-build.sh
+./old-ndk-build.sh || err "Failed to build native code"
 
 # Build the rest
 ant \
@@ -30,4 +38,4 @@ ant \
 	-Dbuild.version.code=183 \
 	-Dnativeoff=false \
 	"-DversionFeatures=+play_market +gps_status -parking_plugin -blackberry -amazon -route_nav" \
-	clean release
+	clean release || err "Failed to build OsmAnd (java) via ant"
