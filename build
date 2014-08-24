@@ -1,5 +1,8 @@
 #!/bin/bash
 
+OSMAND_VERSION="1.8.3"
+OSMAND_VERCODE="183"
+
 err() {
 	echo ERR: "$@"
 	exit 1
@@ -28,14 +31,14 @@ ant \
 	-Dndk.dir="$ANDROID_NDK" \
 	-DBLACKBERRY_BUILD=false \
 	-DBUILD_SUFFIX= \
-	-DAPK_NUMBER_VERSION=183 \
+	-Dbuild.version="$OSMAND_VERSION" \
+	-DAPK_VERSION="$OSMAND_VERSION" \
+	-Dbuild.version.code="$OSMAND_VERCODE" \
+	-DAPK_NUMBER_VERSION="$OSMAND_VERCODE" \
 	"-DFEATURES=+play_market +gps_status -parking_plugin -blackberry -amazon -route_nav" \
 	-DCLEAN_CPP=false \
 	-DPACKAGE_TO_BUILT=net.osmand.plus \
-	-DAPK_VERSION=1.8.3 \
 	-Dnet.osmand.plus= \
-	-Dbuild.version=1.8.3 \
-	-Dbuild.version.code=183 \
 	-Dnativeoff=false \
 	"-DversionFeatures=+play_market +gps_status -parking_plugin -blackberry -amazon -route_nav" \
 	clean release || err "Failed to build OsmAnd (java) via ant"
