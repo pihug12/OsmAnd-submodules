@@ -1,10 +1,12 @@
 #!/bin/bash
 
+OSMAND_APPNAME="OsmAnd~"
 OSMAND_VERSION="1.8.3"
 OSMAND_VERCODE="183"
+OSMAND_SUBDIR="android/OsmAnd"
 
 err() {
-	echo ERR: "$@"
+	echo ERROR: "$@"
 	exit 1
 }
 
@@ -14,13 +16,13 @@ then
 	export ANDROID_SDK="$ANDROID_HOME"
 fi
 
-if [[ -d android/OsmAnd ]]
+if [[ -d $OSMAND_SUBDIR ]]
 then
-	cd android/OsmAnd || err "Could not enter android/OsmAnd subdirectory"
+	cd $OSMAND_SUBDIR || err "Could not enter android/OsmAnd subdirectory"
 fi
 
 # Replace the name given to the full paid app
-sed -i 's/"OsmAnd+"/"OsmAnd~"/g' build.xml || err "Could not replace application name"
+sed -i "s/\"OsmAnd+\"/\"$OSMAND_APPNAME\"/g" build.xml || err "Could not replace application name"
 
 # Build native code
 ./old-ndk-build.sh || err "Failed to build native code"
