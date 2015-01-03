@@ -5,6 +5,12 @@ OSMAND_VERSION="1.9.4"
 OSMAND_VERCODE="194"
 OSMAND_SUBDIR="android/OsmAnd"
 
+# '+' enables, '-' disables
+# As found in upstream's jenkins log
+# OSMAND_FEATURES="-play_market -gps_status -parking_plugin -blackberry +amazon -route_nav"
+# Our slightly modified version
+OSMAND_FEATURES="-play_market +gps_status -parking_plugin -blackberry -amazon -route_nav"
+
 err() {
 	echo ERROR: "$@"
 	exit 1
@@ -37,10 +43,10 @@ ant \
 	-DAPK_VERSION="$OSMAND_VERSION" \
 	-Dbuild.version.code="$OSMAND_VERCODE" \
 	-DAPK_NUMBER_VERSION="$OSMAND_VERCODE" \
-	"-DFEATURES=+play_market +gps_status -parking_plugin -blackberry -amazon -route_nav" \
+	-DFEATURES="$OSMAND_FEATURES" \
+	-DversionFeatures="$OSMAND_FEATURES" \
 	-DCLEAN_CPP=false \
 	-DPACKAGE_TO_BUILT=net.osmand.plus \
 	-Dnet.osmand.plus= \
 	-Dnativeoff=false \
-	"-DversionFeatures=+play_market +gps_status -parking_plugin -blackberry -amazon -route_nav" \
 	clean release || err "Failed to build OsmAnd (java) via ant"
