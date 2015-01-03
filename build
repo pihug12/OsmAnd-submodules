@@ -16,7 +16,7 @@ err() {
 	exit 1
 }
 
-# Uses ANDROID_SDK instead of ANDROID_HOME
+# They use ANDROID_SDK instead of ANDROID_HOME
 if [ -z $ANDROID_SDK ] && [ -n $ANDROID_HOME ]
 then
 	export ANDROID_SDK="$ANDROID_HOME"
