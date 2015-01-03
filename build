@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 OSMAND_APPNAME="OsmAnd~"
 OSMAND_VERSION="1.9.4"
@@ -17,12 +17,12 @@ err() {
 }
 
 # Uses ANDROID_SDK instead of ANDROID_HOME
-if [[ -z $ANDROID_SDK ]] && [[ -n $ANDROID_HOME ]]
+if [ -z $ANDROID_SDK ] && [ -n $ANDROID_HOME ]
 then
 	export ANDROID_SDK="$ANDROID_HOME"
 fi
 
-if [[ -d $OSMAND_SUBDIR ]]
+if [ -d $OSMAND_SUBDIR ]
 then
 	cd $OSMAND_SUBDIR || err "Could not enter android/OsmAnd subdirectory"
 fi
