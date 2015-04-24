@@ -1,8 +1,8 @@
 #!/bin/sh
 
 OSMAND_APPNAME="OsmAnd~"
-OSMAND_VERSION="1.9.5"
-OSMAND_VERCODE="197"
+OSMAND_VERSION="2.0.3"
+OSMAND_VERCODE="205"
 OSMAND_SUBDIR="android/OsmAnd"
 
 # '+' enables, '-' disables
@@ -16,43 +16,27 @@ err() {
 	exit 1
 }
 
-# They use ANDROID_SDK instead of ANDROID_HOME
-if [ -z $ANDROID_SDK ] && [ -n $ANDROID_HOME ]
-then
-	export ANDROID_SDK="$ANDROID_HOME"
-fi
-
 if [ -d $OSMAND_SUBDIR ]
 then
-	cd $OSMAND_SUBDIR || err "Could not enter android/OsmAnd subdirectory"
+	cd $OSMAND_SUBDIR || err "Could not enter $OSMAND_SUBBDIR subdirectory"
 fi
-
-# Replace the name given to the full paid app
-sed -i "s/\"OsmAnd+\"/\"$OSMAND_APPNAME\"/g" build.xml || err "Could not replace application name"
 
 # Build native code
 ./old-ndk-build.sh || err "Failed to build native code"
 
-# Do not use download_resources target:
-sed  -i -e '/target name=\"-pre-build\"/s/download_resources,//' -i build.xml
+TARGET_APP_NAME="$OSMAND_APPNAME"
+APP_NAME="$OSMAND_APPNAME"
+APP_FEATURES="$OSMAND_FEATURES"
+APK_NUMBER_VERSION="$OSMAND_VERCODE"
+APK_VERSION="$OSMAND_VERSION"
 
-# Download wrapper (TODO: build wrapper by ourselves)
-wget http://builder.osmand.net/binaries/android/OsmAndCore_wrapper.jar -O libs/OsmAndCore_wrapper.jar
+sed -e '/qt.*Compile/d' -i build.gradle
+sed -e '/signingConfig\s\+signingConfigs\./d' -i build.gradle
 
-# Build the rest
-ant \
-	-Dsdk.dir="$ANDROID_SDK" \
-	-Dndk.dir="$ANDROID_NDK" \
-	-DBLACKBERRY_BUILD=false \
-	-DBUILD_SUFFIX= \
-	-Dbuild.version="$OSMAND_VERSION" \
-	-DAPK_VERSION="$OSMAND_VERSION" \
-	-Dbuild.version.code="$OSMAND_VERCODE" \
-	-DAPK_NUMBER_VERSION="$OSMAND_VERCODE" \
-	-DFEATURES="$OSMAND_FEATURES" \
-	-DversionFeatures="$OSMAND_FEATURES" \
-	-DCLEAN_CPP=false \
-	-DPACKAGE_TO_BUILT=net.osmand.plus \
-	-Dnet.osmand.plus= \
-	-Dnativeoff=false \
-	clean release || err "Failed to build OsmAnd (java) via ant"
+sed -i -e '/sourceSets/icompileOptions {\nsourceCompatibility = JavaVersion.VERSION_1_7\ntargetCompatibility = JavaVersion.VERSION_1_7\n}\n\n' ../eclipse-compile/appcompat/build.gradle build.gradle
+
+sed -i -e "s/System.getenv(\"APK_VERSION\")/\"${APK_VERSION}\"/g" build.gradle
+sed -i -e "s/System.getenv(\"APK_NUMBER_VERSION\")/\"${APK_NUMBER_VERSION}\"/g" build.gradle
+sed -i -e "s/System.getenv(\"APP_FEATURES\")/\"${APP_FEATURES}\"/g" build.gradle
+sed -i -e "s/System.getenv(\"APP_NAME\")/\"${APP_NAME}\"/g" build.gradle
+sed -i -e "s/System.getenv(\"TARGET_APP_NAME\")/\"${APP_NAME}\"/g" build.gradle
